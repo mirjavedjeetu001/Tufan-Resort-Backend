@@ -41,6 +41,12 @@ export class Booking {
   @Column()
   customerNid: string;
 
+  @Column({ nullable: true })
+  customerPhoto: string;
+
+  @Column({ nullable: true })
+  customerNidDocument: string;
+
   @Column()
   customerPhone: string;
 
@@ -91,11 +97,50 @@ export class Booking {
   })
   status: BookingStatus;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  extraCharges: number;
+
+  @Column({ type: 'text', nullable: true })
+  extraChargesDescription: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  discountAmount: number;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  discountPercentage: number;
+
+  @Column({ type: 'enum', enum: ['none', 'percentage', 'flat'], default: 'none' })
+  discountType: string;
+
+  @Column({ nullable: true })
+  foodPackageId: number;
+
+  @Column({ default: 0 })
+  foodPackageGuests: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  foodPackageCost: number;
+
+  @Column({ type: 'simple-json', nullable: true })
+  selectedAddons: any;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  addonsCost: number;
+
   @Column({ type: 'simple-json', nullable: true })
   extras: any;
 
+  @Column({ type: 'simple-json', nullable: true })
+  additionalGuests: any;
+
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @Column({ type: 'time', nullable: true })
+  checkInTime: string;
+
+  @Column({ type: 'time', nullable: true })
+  checkOutTime: string;
 
   @ManyToOne(() => User, (user) => user.bookings)
   @JoinColumn({ name: 'createdById' })

@@ -12,22 +12,28 @@ export class ConventionHall {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   dimensions: number; // in sq ft
 
-  @Column()
+  @Column({ nullable: true })
   maxCapacity: number;
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  pricePerDay: number;
+
+  @Column({ default: true })
+  isAvailable: boolean;
+
+  @Column({ type: 'simple-array', nullable: true })
   amenities: string[];
 
   @Column({ type: 'simple-array', nullable: true })
   images: string[];
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'simple-array', nullable: true })
   eventTypes: string[];
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'simple-array', nullable: true })
   timeSlots: string[];
 
   @OneToMany(() => ConventionBooking, (booking) => booking.hall)

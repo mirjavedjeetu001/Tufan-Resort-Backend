@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { ConventionHall } from './convention-hall.entity';
 import { User } from './user.entity';
+import { ConventionPayment } from './convention-payment.entity';
 
 export enum ConventionBookingStatus {
   PENDING = 'pending',
@@ -37,7 +38,7 @@ export class ConventionBooking {
   @Column()
   customerName: string;
 
-  @Column()
+  @Column({ nullable: true })
   customerNid: string;
 
   @Column()
@@ -46,7 +47,7 @@ export class ConventionBooking {
   @Column({ nullable: true })
   customerWhatsapp: string;
 
-  @Column()
+  @Column({ nullable: true })
   customerEmail: string;
 
   @Column({ type: 'text', nullable: true })
@@ -61,11 +62,32 @@ export class ConventionBooking {
   @Column()
   eventType: string;
 
+  @Column({ nullable: true })
+  organizationName: string;
+
+  @Column({ type: 'text', nullable: true })
+  eventDescription: string;
+
   @Column()
   numberOfGuests: number;
 
-  @Column({ type: 'simple-array', nullable: true })
-  addOns: string[];
+  @Column({ nullable: true })
+  foodPackageId: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  foodCost: number;
+
+  @Column({ type: 'simple-json', nullable: true })
+  selectedAddons: any;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  addonsCost: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  hallRent: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  discount: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   totalAmount: number;
@@ -98,6 +120,9 @@ export class ConventionBooking {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @OneToMany(() => ConventionPayment, (payment) => payment.booking)
+  payments: ConventionPayment[];
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'createdById' })

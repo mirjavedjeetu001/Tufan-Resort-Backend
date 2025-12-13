@@ -19,6 +19,9 @@ export class Room {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ unique: true })
+  roomNumber: string;
+
   @Column()
   name: string;
 
@@ -34,13 +37,13 @@ export class Room {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   pricePerNight: number;
 
-  @Column()
+  @Column({ nullable: true })
   maxGuests: number;
 
-  @Column()
+  @Column({ nullable: true })
   numberOfBeds: number;
 
-  @Column({ type: 'simple-array' })
+  @Column({ type: 'simple-array', nullable: true })
   amenities: string[];
 
   @Column({ type: 'simple-array', nullable: true })

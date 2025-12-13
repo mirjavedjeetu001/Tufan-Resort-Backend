@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Booking, BookingStatus } from '../entities/booking.entity';
 
 @Injectable()
@@ -25,12 +25,13 @@ export class BookingsService {
   }
 
   async findByDateRange(startDate: Date, endDate: Date) {
-    return this.bookingRepository.find({
-      where: {
-        checkInDate: Between(startDate, endDate),
-      },
-      relations: ['room'],
-    });
+    return this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.room', 'room')
+      .where('booking.checkInDate < :endDate', { endDate })
+      .andWhere('booking.checkOutDate > :startDate', { startDate })
+      .orderBy('booking.checkInDate', 'ASC')
+      .getMany();
   }
 
   async create(bookingData: Partial<Booking>) {
@@ -52,15 +53,21 @@ export class BookingsService {
     const confirmedBookings = await this.bookingRepository.count({
       where: { status: BookingStatus.CONFIRMED },
     });
-    const totalRevenue = await this.bookingRepository
+    
+    // Calculate revenue with discount and extra charges
+    const revenueQuery = await this.bookingRepository
       .createQueryBuilder('booking')
-      .select('SUM(booking.totalAmount)', 'total')
+      .select('SUM(booking.totalAmount + COALESCE(booking.extraCharges, 0) - ' +
+              'CASE ' +
+              'WHEN booking.discountType = "percentage" THEN (booking.totalAmount * COALESCE(booking.discountPercentage, 0) / 100) ' +
+              'WHEN booking.discountType = "flat" THEN COALESCE(booking.discountAmount, 0) ' +
+              'ELSE 0 END)', 'total')
       .getRawOne();
 
     return {
       totalBookings,
       confirmedBookings,
-      totalRevenue: totalRevenue.total || 0,
+      totalRevenue: parseFloat(revenueQuery.total) || 0,
     };
   }
 }

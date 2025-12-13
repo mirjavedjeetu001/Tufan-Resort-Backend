@@ -6,6 +6,19 @@ export enum UserRole {
   STAFF = 'staff',
 }
 
+export enum Permission {
+  DASHBOARD_VIEW = 'dashboard.view',
+  ROOMS_MANAGE = 'rooms.manage',
+  BOOKINGS_MANAGE = 'bookings.manage',
+  CONVENTION_MANAGE = 'convention.manage',
+  CONVENTION_BOOKINGS_MANAGE = 'convention-bookings.manage',
+  FOOD_PACKAGES_MANAGE = 'food-packages.manage',
+  ADDON_SERVICES_MANAGE = 'addon-services.manage',
+  HERO_SLIDES_MANAGE = 'hero-slides.manage',
+  RESORT_SETTINGS_MANAGE = 'resort-settings.manage',
+  USERS_MANAGE = 'users.manage',
+}
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
@@ -26,6 +39,9 @@ export class User {
     default: UserRole.STAFF,
   })
   role: UserRole;
+
+  @Column({ type: 'simple-json', nullable: true })
+  permissions: Permission[];
 
   @Column({ default: true })
   isActive: boolean;

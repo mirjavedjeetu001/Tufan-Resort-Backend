@@ -84,6 +84,11 @@ export class HeroSlidesController {
     @Body() slideData: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    // Remove invalid fields that might come from old data
+    delete slideData.subtitle;
+    delete slideData.buttonText;
+    delete slideData.buttonLink;
+    
     if (file) {
       slideData.image = `/uploads/hero/${file.filename}`;
     }

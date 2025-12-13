@@ -114,13 +114,22 @@ Password: Admin@123
 
 ## 🎨 DESIGN FEATURES
 
+### Premium Bangladeshi Theme:
+- ✅ **Forest Green Primary** - #006747 (Bangladesh nature & flag inspired)
+- ✅ **Golden Yellow Accent** - #f4a425 (Royal Bengali touch)
+- ✅ **Crimson Red Secondary** - #d32f2f (Bangladesh flag color)
+- ✅ **Bengali Typography** - Bilingual interface (English/বাংলা)
+- ✅ **Cultural Icons** - 🏞️ 🌊 🍛 🌿 (Bangladesh-inspired)
+- ✅ **Taka Currency** - ৳ symbol for pricing
+- ✅ **Made in Bangladesh** - Proud local branding
+
 ### Premium UI/UX Elements:
-- ✅ **Gradient Backgrounds** - Modern teal/turquoise theme
+- ✅ **Gradient Backgrounds** - Modern green/golden theme
 - ✅ **Smooth Animations** - Hover effects, transitions, transforms
 - ✅ **Glass Morphism** - Semi-transparent overlays
 - ✅ **Shadow Effects** - Depth and elevation
 - ✅ **Responsive Sidebar** - Mobile-friendly navigation
-- ✅ **Icon Integration** - SVG icons throughout
+- ✅ **Bengali Icons** - Lake, nature, Bengali food themed
 - ✅ **Status Badges** - Color-coded indicators
 - ✅ **Loading States** - Spinning loaders
 - ✅ **Modal Dialogs** - Beautiful forms with backdrop blur
@@ -129,10 +138,10 @@ Password: Admin@123
 - ✅ **Color Coded Status** - Visual feedback everywhere
 
 ### Color Scheme:
-- **Primary:** `#008080` (Teal/Turquoise)
-- **Accent:** `#FFD700` (Gold)
-- **Secondary:** `#F5F5DC` (Beige)
-- **Gradients:** Teal-600, Purple-500, Pink-500
+- **Primary:** `#006747` (Forest Green - Bangladesh nature)
+- **Accent:** `#f4a425` (Golden Yellow - Royal Bengali)
+- **Secondary:** `#d32f2f` (Crimson Red - Bangladesh flag)
+- **Gradients:** Green-600, Gold-500, Red-600
 
 ---
 

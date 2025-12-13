@@ -11,13 +11,18 @@ import { ConventionHallModule } from './convention-hall/convention-hall.module';
 import { ConventionBookingsModule } from './convention-bookings/convention-bookings.module';
 import { HeroSlidesModule } from './hero-slides/hero-slides.module';
 import { ResortInfoModule } from './resort-info/resort-info.module';
+import { FoodPackagesModule } from './food-packages/food-packages.module';
+import { AddonServicesModule } from './addon-services/addon-services.module';
 import { User } from './entities/user.entity';
 import { Room } from './entities/room.entity';
 import { Booking } from './entities/booking.entity';
 import { ConventionHall } from './entities/convention-hall.entity';
 import { ConventionBooking } from './entities/convention-booking.entity';
+import { ConventionPayment } from './entities/convention-payment.entity';
 import { HeroSlide } from './entities/hero-slide.entity';
 import { ResortInfo } from './entities/resort-info.entity';
+import { FoodPackage } from './entities/food-package.entity';
+import { AddonService } from './entities/addon-service.entity';
 
 @Module({
   imports: [
@@ -33,7 +38,7 @@ import { ResortInfo } from './entities/resort-info.entity';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User, Room, Booking, ConventionHall, ConventionBooking, HeroSlide, ResortInfo],
+        entities: [User, Room, Booking, ConventionHall, ConventionBooking, ConventionPayment, HeroSlide, ResortInfo, FoodPackage, AddonService],
         synchronize: true, // Set to false in production
       }),
       inject: [ConfigService],
@@ -50,6 +55,8 @@ import { ResortInfo } from './entities/resort-info.entity';
     ConventionBookingsModule,
     HeroSlidesModule,
     ResortInfoModule,
+    FoodPackagesModule,
+    AddonServicesModule,
   ],
 })
 export class AppModule {}

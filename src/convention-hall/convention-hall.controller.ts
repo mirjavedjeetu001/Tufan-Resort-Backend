@@ -88,6 +88,9 @@ export class ConventionHallController {
     @Body() hallData: any,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
+    // Remove invalid fields that might come from old data
+    delete hallData.capacity;
+    
     if (files && files.length > 0) {
       const newImages = files.map((file) => `/uploads/convention/${file.filename}`);
       hallData.images = hallData.images

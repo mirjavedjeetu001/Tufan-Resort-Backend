@@ -9,7 +9,12 @@ import {
   UseGuards,
   Request,
   Query,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { BookingsService } from './bookings.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -51,7 +56,53 @@ export class BookingsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.OWNER, UserRole.STAFF)
-  create(@Body() bookingData: any, @Request() req) {
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'customerPhoto', maxCount: 1 },
+        { name: 'customerNidDocument', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './uploads/bookings',
+          filename: (req, file, cb) => {
+            const randomName = Array(32)
+              .fill(null)
+              .map(() => Math.round(Math.random() * 16).toString(16))
+              .join('');
+            cb(null, `${randomName}${extname(file.originalname)}`);
+          },
+        }),
+      },
+    ),
+  )
+  create(
+    @Body() bookingData: any,
+    @UploadedFiles() files: { customerPhoto?: Express.Multer.File[]; customerNidDocument?: Express.Multer.File[] },
+    @Request() req,
+  ) {
+    if (files?.customerPhoto) {
+      bookingData.customerPhoto = files.customerPhoto[0].filename;
+    }
+    if (files?.customerNidDocument) {
+      bookingData.customerNidDocument = files.customerNidDocument[0].filename;
+    }
+    
+    // Parse JSON fields if they exist
+    if (bookingData.additionalGuests && typeof bookingData.additionalGuests === 'string') {
+      bookingData.additionalGuests = JSON.parse(bookingData.additionalGuests);
+    }
+    
+    // Convert numeric fields from strings
+    bookingData.roomId = parseInt(bookingData.roomId);
+    bookingData.numberOfGuests = parseInt(bookingData.numberOfGuests);
+    bookingData.totalAmount = parseFloat(bookingData.totalAmount);
+    bookingData.advancePayment = parseFloat(bookingData.advancePayment);
+    bookingData.remainingPayment = parseFloat(bookingData.remainingPayment);
+    bookingData.extraCharges = parseFloat(bookingData.extraCharges || 0);
+    bookingData.discountPercentage = parseFloat(bookingData.discountPercentage || 0);
+    bookingData.discountAmount = parseFloat(bookingData.discountAmount || 0);
+    
     bookingData.createdById = req.user.userId;
     return this.bookingsService.create(bookingData);
   }

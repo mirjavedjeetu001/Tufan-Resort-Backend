@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   UploadedFiles,
   UseInterceptors,
@@ -29,8 +30,34 @@ export class RoomsController {
   }
 
   @Get('available')
-  findAvailable() {
+  findAvailable(@Query('checkIn') checkIn?: string, @Query('checkOut') checkOut?: string) {
+    if (checkIn && checkOut) {
+      const checkInDate = new Date(checkIn);
+      const checkOutDate = new Date(checkOut);
+      return this.roomsService.findAvailableByDate(checkInDate, checkOutDate);
+    }
     return this.roomsService.findAvailable();
+  }
+
+  @Get('search')
+  searchRooms(@Query('q') query: string) {
+    return this.roomsService.searchRooms(query);
+  }
+
+  @Get('by-room-number/:roomNumber')
+  findByRoomNumber(@Param('roomNumber') roomNumber: string) {
+    return this.roomsService.findByRoomNumber(roomNumber);
+  }
+
+  @Get('check-availability/:roomNumber')
+  checkRoomAvailability(
+    @Param('roomNumber') roomNumber: string,
+    @Query('checkIn') checkIn: string,
+    @Query('checkOut') checkOut: string,
+  ) {
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+    return this.roomsService.checkRoomAvailability(roomNumber, checkInDate, checkOutDate);
   }
 
   @Get(':id')

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User, UserRole } from '../entities/user.entity';
+import { User, UserRole, Permission } from '../entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +13,7 @@ export class UsersService {
 
   async findAll() {
     return this.userRepository.find({
-      select: ['id', 'email', 'name', 'role', 'isActive', 'createdAt'],
+      select: ['id', 'email', 'name', 'role', 'permissions', 'isActive', 'createdAt'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -21,15 +21,16 @@ export class UsersService {
   async findOne(id: number) {
     return this.userRepository.findOne({
       where: { id },
-      select: ['id', 'email', 'name', 'role', 'isActive', 'createdAt'],
+      select: ['id', 'email', 'name', 'role', 'permissions', 'isActive', 'createdAt'],
     });
   }
 
-  async create(userData: { email: string; password: string; name: string; role: UserRole }) {
+  async create(userData: { email: string; password: string; name: string; role: UserRole; permissions?: Permission[] }) {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
+      permissions: userData.permissions || [],
     });
     await this.userRepository.save(user);
     const { password, ...result } = user;
