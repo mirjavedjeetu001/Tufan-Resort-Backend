@@ -51,6 +51,12 @@ export class Booking {
   customerPhone: string;
 
   @Column({ nullable: true })
+  referenceName: string;
+
+  @Column({ nullable: true })
+  referencePhone: string;
+
+  @Column({ nullable: true })
   customerWhatsapp: string;
 
   @Column()

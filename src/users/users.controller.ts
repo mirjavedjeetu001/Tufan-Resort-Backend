@@ -48,4 +48,16 @@ export class UsersController {
   delete(@Param('id') id: string) {
     return this.usersService.delete(+id);
   }
+
+  @Put(':id/toggle-active')
+  @Roles(UserRole.OWNER)
+  toggleActive(@Param('id') id: string) {
+    return this.usersService.toggleActive(+id);
+  }
+
+  @Put(':id/permissions')
+  @Roles(UserRole.OWNER)
+  updatePermissions(@Param('id') id: string, @Body() body: { permissions: any[] }) {
+    return this.usersService.updatePermissions(+id, body.permissions);
+  }
 }

@@ -48,4 +48,20 @@ export class UsersService {
   async delete(id: number) {
     return this.userRepository.delete(id);
   }
+
+  async toggleActive(id: number) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    user.isActive = !user.isActive;
+    await this.userRepository.save(user);
+    const { password, ...result } = user;
+    return result;
+  }
+
+  async updatePermissions(id: number, permissions: Permission[]) {
+    await this.userRepository.update(id, { permissions });
+    return this.findOne(id);
+  }
 }

@@ -17,6 +17,8 @@ export enum Permission {
   HERO_SLIDES_MANAGE = 'hero-slides.manage',
   RESORT_SETTINGS_MANAGE = 'resort-settings.manage',
   USERS_MANAGE = 'users.manage',
+  MENU_MANAGE = 'menu.manage',
+  ACCESS_CONTROL_MANAGE = 'access-control.manage',
 }
 
 @Entity('users')

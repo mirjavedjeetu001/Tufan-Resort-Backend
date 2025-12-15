@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Booking, BookingStatus } from '../entities/booking.entity';
+import { Booking, BookingStatus, PaymentStatus } from '../entities/booking.entity';
 
 @Injectable()
 export class BookingsService {
@@ -11,6 +11,7 @@ export class BookingsService {
   ) {}
 
   async findAll() {
+    await this.autoCheckoutOverdue();
     return this.bookingRepository.find({
       relations: ['room', 'createdBy'],
       order: { createdAt: 'DESC' },
@@ -25,6 +26,7 @@ export class BookingsService {
   }
 
   async findByDateRange(startDate: Date, endDate: Date) {
+    await this.autoCheckoutOverdue();
     return this.bookingRepository
       .createQueryBuilder('booking')
       .leftJoinAndSelect('booking.room', 'room')
@@ -69,5 +71,31 @@ export class BookingsService {
       confirmedBookings,
       totalRevenue: parseFloat(revenueQuery.total) || 0,
     };
+  }
+
+  // Auto-checkout any past-due stays and keep payment status pending if money is owed
+  private async autoCheckoutOverdue() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const overdue = await this.bookingRepository
+      .createQueryBuilder('booking')
+      .where('booking.checkOutDate < CURRENT_DATE')
+      .andWhere('booking.status NOT IN (:...statuses)', {
+        statuses: [BookingStatus.CHECKED_OUT, BookingStatus.CANCELLED],
+      })
+      .getMany();
+
+    if (!overdue.length) return;
+
+    const updates = overdue.map((booking) => {
+      const nextPaymentStatus = booking.remainingPayment > 0 ? PaymentStatus.PENDING : booking.paymentStatus;
+      return this.bookingRepository.update(booking.id, {
+        status: BookingStatus.CHECKED_OUT,
+        paymentStatus: nextPaymentStatus,
+      });
+    });
+
+    await Promise.all(updates);
   }
 }
