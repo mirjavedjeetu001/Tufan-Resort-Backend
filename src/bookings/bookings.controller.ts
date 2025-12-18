@@ -61,6 +61,8 @@ export class BookingsController {
       [
         { name: 'customerPhoto', maxCount: 1 },
         { name: 'customerNidDocument', maxCount: 1 },
+        { name: 'passportDocument', maxCount: 1 },
+        { name: 'visitingCard', maxCount: 1 },
       ],
       {
         storage: diskStorage({
@@ -78,14 +80,25 @@ export class BookingsController {
   )
   create(
     @Body() bookingData: any,
-    @UploadedFiles() files: { customerPhoto?: Express.Multer.File[]; customerNidDocument?: Express.Multer.File[] },
+    @UploadedFiles() files: { 
+      customerPhoto?: Express.Multer.File[]; 
+      customerNidDocument?: Express.Multer.File[];
+      passportDocument?: Express.Multer.File[];
+      visitingCard?: Express.Multer.File[];
+    },
     @Request() req,
   ) {
     if (files?.customerPhoto) {
-      bookingData.customerPhoto = files.customerPhoto[0].filename;
+      bookingData.customerPhoto = `/uploads/bookings/${files.customerPhoto[0].filename}`;
     }
     if (files?.customerNidDocument) {
-      bookingData.customerNidDocument = files.customerNidDocument[0].filename;
+      bookingData.customerNidDocument = `/uploads/bookings/${files.customerNidDocument[0].filename}`;
+    }
+    if (files?.passportDocument) {
+      bookingData.passportDocument = `/uploads/bookings/${files.passportDocument[0].filename}`;
+    }
+    if (files?.visitingCard) {
+      bookingData.visitingCard = `/uploads/bookings/${files.visitingCard[0].filename}`;
     }
     
     // Parse JSON fields if they exist

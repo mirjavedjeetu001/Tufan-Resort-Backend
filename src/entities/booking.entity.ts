@@ -47,6 +47,15 @@ export class Booking {
   @Column({ nullable: true })
   customerNidDocument: string;
 
+  @Column({ nullable: true })
+  passportNumber: string;
+
+  @Column({ nullable: true })
+  passportDocument: string;
+
+  @Column({ nullable: true })
+  visitingCard: string;
+
   @Column()
   customerPhone: string;
 
@@ -147,6 +156,15 @@ export class Booking {
 
   @Column({ type: 'time', nullable: true })
   checkOutTime: string;
+
+  @Column({ default: 'ac' })
+  acPreference: string;
+
+  @Column({ default: false })
+  vatEnabled: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  vatAmount: number;
 
   @ManyToOne(() => User, (user) => user.bookings)
   @JoinColumn({ name: 'createdById' })

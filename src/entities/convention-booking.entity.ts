@@ -10,6 +10,14 @@ export enum ConventionBookingStatus {
   CANCELLED = 'cancelled',
 }
 
+export enum ProgramStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  RUNNING = 'running',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
 export enum PaymentMethod {
   CASH = 'cash',
   CARD = 'card',
@@ -80,6 +88,9 @@ export class ConventionBooking {
   @Column({ type: 'simple-json', nullable: true })
   selectedAddons: any;
 
+  @Column({ type: 'simple-json', nullable: true })
+  addonQuantities: any;
+
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   addonsCost: number;
 
@@ -117,6 +128,13 @@ export class ConventionBooking {
     default: ConventionBookingStatus.PENDING,
   })
   status: ConventionBookingStatus;
+
+  @Column({
+    type: 'enum',
+    enum: ProgramStatus,
+    default: ProgramStatus.PENDING,
+  })
+  programStatus: ProgramStatus;
 
   @Column({ type: 'text', nullable: true })
   notes: string;

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConventionBooking, PaymentStatus } from '../entities/convention-booking.entity';
 import { ConventionPayment } from '../entities/convention-payment.entity';
+import { ConventionHall } from '../entities/convention-hall.entity';
 import { PaymentMethod } from '../entities/convention-booking.entity';
 
 @Injectable()
@@ -12,6 +13,8 @@ export class ConventionBookingsService {
     private bookingRepository: Repository<ConventionBooking>,
     @InjectRepository(ConventionPayment)
     private paymentRepository: Repository<ConventionPayment>,
+    @InjectRepository(ConventionHall)
+    private hallRepository: Repository<ConventionHall>,
   ) {}
 
   async findAll() {
@@ -159,9 +162,55 @@ export class ConventionBookingsService {
     }).then((bookings) => bookings.filter((b) => b.status !== 'cancelled' && this.timeSlotOverlaps(b.timeSlot, timeSlot)));
   }
 
+  async checkHallAvailability(hallId: number, date: Date, timeSlot: string) {
+    try {
+      const hall = await this.hallRepository.findOne({ where: { id: hallId } });
+      if (!hall) {
+        throw new Error('Hall not found');
+      }
+
+      // Normalize date to start of day for consistent comparison
+      const searchDate = new Date(date);
+      searchDate.setHours(0, 0, 0, 0);
+
+      const existingBookings = await this.bookingRepository.find({
+        where: { 
+          hallId,
+        },
+        relations: ['hall'],
+      });
+
+      // Filter bookings for the same date
+      const sameDayBookings = existingBookings.filter(booking => {
+        const bookingDate = new Date(booking.eventDate);
+        bookingDate.setHours(0, 0, 0, 0);
+        return bookingDate.getTime() === searchDate.getTime();
+      });
+
+      const conflictingBookings = sameDayBookings.filter(
+        (b) => b.status !== 'cancelled' && this.timeSlotOverlaps(b.timeSlot, timeSlot)
+      );
+
+      const available = conflictingBookings.length === 0;
+
+      return {
+        available,
+        hall,
+        conflictingBookings: available ? [] : conflictingBookings,
+        message: available 
+          ? `${hall.name} is available for ${timeSlot} on ${searchDate.toLocaleDateString('en-GB')}`
+          : `${hall.name} is already booked for ${timeSlot} on ${searchDate.toLocaleDateString('en-GB')}`
+      };
+    } catch (error) {
+      console.error('Error checking hall availability:', error);
+      throw error;
+    }
+  }
+
   private timeSlotOverlaps(existing: string, incoming: string) {
     if (!existing || !incoming) return false;
     if (existing === 'fullday' || incoming === 'fullday') return true;
+    if (existing === 'custom' || incoming === 'custom') return true; // For custom times, assume overlap
     return existing === incoming;
   }
 }

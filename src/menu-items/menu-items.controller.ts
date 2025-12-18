@@ -4,6 +4,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { MenuItemsService } from './menu-items.service';
 import { MenuItem } from '../entities/menu-item.entity';
+import { UserRole } from '../entities/user.entity';
 
 @Controller('menu-items')
 @UseGuards(JwtAuthGuard)
@@ -22,7 +23,7 @@ export class MenuItemsController {
 
   @Get('seed')
   @UseGuards(RolesGuard)
-  @Roles('owner')
+  @Roles(UserRole.OWNER)
   seedDefaultMenus() {
     return this.menuItemsService.seedDefaultMenus();
   }
@@ -34,28 +35,28 @@ export class MenuItemsController {
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles('owner')
+  @Roles(UserRole.OWNER)
   create(@Body() menuItemData: Partial<MenuItem>) {
     return this.menuItemsService.create(menuItemData);
   }
 
   @Put(':id')
   @UseGuards(RolesGuard)
-  @Roles('owner')
+  @Roles(UserRole.OWNER)
   update(@Param('id') id: string, @Body() menuItemData: Partial<MenuItem>) {
     return this.menuItemsService.update(+id, menuItemData);
   }
 
   @Put(':id/toggle')
   @UseGuards(RolesGuard)
-  @Roles('owner')
+  @Roles(UserRole.OWNER)
   toggleActive(@Param('id') id: string) {
     return this.menuItemsService.toggleActive(+id);
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
-  @Roles('owner')
+  @Roles(UserRole.OWNER)
   delete(@Param('id') id: string) {
     return this.menuItemsService.delete(+id);
   }

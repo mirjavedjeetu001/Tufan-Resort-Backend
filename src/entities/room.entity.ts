@@ -37,6 +37,15 @@ export class Room {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   pricePerNight: number;
 
+  @Column({ default: true })
+  hasAC: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  acPrice: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  nonAcPrice: number;
+
   @Column({ nullable: true })
   maxGuests: number;
 

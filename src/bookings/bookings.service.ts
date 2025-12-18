@@ -51,7 +51,13 @@ export class BookingsService {
   }
 
   async getMetrics() {
-    const totalBookings = await this.bookingRepository.count();
+    const totalBookings = await this.bookingRepository.count({
+      where: [
+        { status: BookingStatus.CONFIRMED },
+        { status: BookingStatus.CHECKED_IN },
+        { status: BookingStatus.CHECKED_OUT },
+      ],
+    });
     const confirmedBookings = await this.bookingRepository.count({
       where: { status: BookingStatus.CONFIRMED },
     });

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -14,6 +15,7 @@ import { ResortInfoModule } from './resort-info/resort-info.module';
 import { FoodPackagesModule } from './food-packages/food-packages.module';
 import { AddonServicesModule } from './addon-services/addon-services.module';
 import { MenuItemsModule } from './menu-items/menu-items.module';
+import { RoomTypesModule } from './room-types/room-types.module';
 import { User } from './entities/user.entity';
 import { Room } from './entities/room.entity';
 import { Booking } from './entities/booking.entity';
@@ -25,12 +27,14 @@ import { ResortInfo } from './entities/resort-info.entity';
 import { FoodPackage } from './entities/food-package.entity';
 import { AddonService } from './entities/addon-service.entity';
 import { MenuItem } from './entities/menu-item.entity';
+import { RoomTypeEntity } from './entities/room-type.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -40,7 +44,7 @@ import { MenuItem } from './entities/menu-item.entity';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User, Room, Booking, ConventionHall, ConventionBooking, ConventionPayment, HeroSlide, ResortInfo, FoodPackage, AddonService, MenuItem],
+        entities: [User, Room, Booking, ConventionHall, ConventionBooking, ConventionPayment, HeroSlide, ResortInfo, FoodPackage, AddonService, MenuItem, RoomTypeEntity],
         synchronize: true, // Set to false in production
       }),
       inject: [ConfigService],
@@ -60,6 +64,7 @@ import { MenuItem } from './entities/menu-item.entity';
     FoodPackagesModule,
     AddonServicesModule,
     MenuItemsModule,
+    RoomTypesModule,
   ],
 })
 export class AppModule {}

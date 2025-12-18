@@ -59,6 +59,17 @@ export class HeroSlidesController {
     if (file) {
       slideData.image = `/uploads/hero/${file.filename}`;
     }
+    
+    // Parse order to number
+    if (slideData.order) {
+      slideData.order = parseInt(slideData.order);
+    }
+    
+    // Parse isActive to boolean
+    if (slideData.isActive !== undefined) {
+      slideData.isActive = slideData.isActive === 'true' || slideData.isActive === true;
+    }
+    
     return this.slidesService.create(slideData);
   }
 
@@ -84,14 +95,20 @@ export class HeroSlidesController {
     @Body() slideData: any,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    // Remove invalid fields that might come from old data
-    delete slideData.subtitle;
-    delete slideData.buttonText;
-    delete slideData.buttonLink;
-    
     if (file) {
       slideData.image = `/uploads/hero/${file.filename}`;
     }
+    
+    // Parse order to number
+    if (slideData.order) {
+      slideData.order = parseInt(slideData.order);
+    }
+    
+    // Parse isActive to boolean
+    if (slideData.isActive !== undefined) {
+      slideData.isActive = slideData.isActive === 'true' || slideData.isActive === true;
+    }
+    
     return this.slidesService.update(+id, slideData);
   }
 

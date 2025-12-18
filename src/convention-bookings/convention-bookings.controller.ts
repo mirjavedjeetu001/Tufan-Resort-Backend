@@ -11,6 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ConventionBookingsService } from './convention-bookings.service';
+import { ConventionBookingsScheduler } from './convention-bookings.scheduler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -19,7 +20,10 @@ import { PaymentMethod } from '../entities/convention-booking.entity';
 
 @Controller('convention-bookings')
 export class ConventionBookingsController {
-  constructor(private bookingsService: ConventionBookingsService) {}
+  constructor(
+    private bookingsService: ConventionBookingsService,
+    private scheduler: ConventionBookingsScheduler,
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,7 +31,12 @@ export class ConventionBookingsController {
   findAll() {
     return this.bookingsService.findAll();
   }
-
+  @Post('update-statuses')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  async updateStatuses() {
+    return this.scheduler.runManualUpdate();
+  }
   @Get('by-date')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.OWNER, UserRole.STAFF)
@@ -40,6 +49,17 @@ export class ConventionBookingsController {
   @Roles(UserRole.OWNER, UserRole.STAFF)
   availability(@Query('date') date: string, @Query('timeSlot') timeSlot: string) {
     return this.bookingsService.availability(new Date(date), timeSlot);
+  }
+
+  @Get('check-availability/:hallId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.OWNER, UserRole.STAFF)
+  checkAvailability(
+    @Param('hallId') hallId: string,
+    @Query('date') date: string,
+    @Query('timeSlot') timeSlot: string
+  ) {
+    return this.bookingsService.checkHallAvailability(+hallId, new Date(date), timeSlot);
   }
 
   @Get(':id')

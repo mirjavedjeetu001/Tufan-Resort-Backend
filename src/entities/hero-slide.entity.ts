@@ -11,6 +11,15 @@ export class HeroSlide {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'text', nullable: true })
+  subtitle: string;
+
+  @Column({ nullable: true })
+  buttonText: string;
+
+  @Column({ nullable: true })
+  buttonLink: string;
+
   @Column()
   image: string;
 

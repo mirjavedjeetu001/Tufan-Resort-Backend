@@ -29,6 +29,21 @@ export class ResortInfo {
   @Column({ type: 'simple-array', nullable: true })
   facilities: string[];
 
+  @Column({ default: false })
+  vatEnabled: boolean;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  vatPercentage: number;
+
+  @Column({ type: 'enum', enum: ['fixed', 'automatic'], default: 'automatic', nullable: false })
+  checkInCheckOutMode: string;
+
+  @Column({ nullable: true })
+  defaultCheckInTime: string;
+
+  @Column({ nullable: true })
+  defaultCheckOutTime: string;
+
   @UpdateDateColumn()
   updatedAt: Date;
 }
