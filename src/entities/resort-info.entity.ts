@@ -5,11 +5,26 @@ export class ResortInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  resortName: string;
+
+  @Column({ nullable: true })
+  resortTagline: string;
+
+  @Column({ nullable: true })
+  logoUrl: string;
+
+  @Column({ nullable: true })
+  navbarTitle: string;
+
   @Column({ type: 'text' })
   aboutText: string;
 
   @Column({ type: 'text', nullable: true })
   missionText: string;
+
+  @Column({ type: 'text', nullable: true })
+  footerDescription: string;
 
   @Column()
   address: string;
@@ -19,6 +34,18 @@ export class ResortInfo {
 
   @Column()
   email: string;
+
+  @Column({ nullable: true })
+  facebookUrl: string;
+
+  @Column({ nullable: true })
+  instagramUrl: string;
+
+  @Column({ nullable: true })
+  twitterUrl: string;
+
+  @Column({ type: 'text', nullable: true })
+  copyrightText: string;
 
   @Column({ nullable: true })
   mapEmbedUrl: string;

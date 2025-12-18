@@ -100,6 +100,18 @@ export class ConventionBooking {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   discount: number;
 
+  @Column({ type: 'enum', enum: ['flat', 'percentage'], default: 'flat' })
+  discountType: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  discountValue: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  vatAmount: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  vatPercentage: number;
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   totalAmount: number;
 

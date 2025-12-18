@@ -28,6 +28,13 @@ import { FoodPackage } from './entities/food-package.entity';
 import { AddonService } from './entities/addon-service.entity';
 import { MenuItem } from './entities/menu-item.entity';
 import { RoomTypeEntity } from './entities/room-type.entity';
+import { SystemSetting } from './entities/system-setting.entity';
+import { NavbarLink } from './entities/navbar-link.entity';
+import { FooterSection } from './entities/footer-section.entity';
+import { FooterLink } from './entities/footer-link.entity';
+import { SystemSettingsModule } from './system-settings/system-settings.module';
+import { NavbarModule } from './navbar/navbar.module';
+import { FooterModule } from './footer/footer.module';
 
 @Module({
   imports: [
@@ -44,7 +51,7 @@ import { RoomTypeEntity } from './entities/room-type.entity';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User, Room, Booking, ConventionHall, ConventionBooking, ConventionPayment, HeroSlide, ResortInfo, FoodPackage, AddonService, MenuItem, RoomTypeEntity],
+        entities: [User, Room, Booking, ConventionHall, ConventionBooking, ConventionPayment, HeroSlide, ResortInfo, FoodPackage, AddonService, MenuItem, RoomTypeEntity, SystemSetting, NavbarLink, FooterSection, FooterLink],
         synchronize: true, // Set to false in production
       }),
       inject: [ConfigService],
@@ -65,6 +72,9 @@ import { RoomTypeEntity } from './entities/room-type.entity';
     AddonServicesModule,
     MenuItemsModule,
     RoomTypesModule,
+    SystemSettingsModule,
+    NavbarModule,
+    FooterModule,
   ],
 })
 export class AppModule {}

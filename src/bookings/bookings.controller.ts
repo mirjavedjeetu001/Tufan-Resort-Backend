@@ -39,6 +39,13 @@ export class BookingsController {
     return this.bookingsService.getMetrics();
   }
 
+  @Get('customer/:phone')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.OWNER, UserRole.STAFF)
+  findByPhone(@Param('phone') phone: string) {
+    return this.bookingsService.findByPhone(phone);
+  }
+
   @Get('date-range')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.OWNER, UserRole.STAFF)

@@ -31,6 +31,25 @@ export class ConventionBookingsService {
     });
   }
 
+  async findByPhone(phone: string) {
+    const booking = await this.bookingRepository.findOne({
+      where: { customerPhone: phone },
+      order: { createdAt: 'DESC' },
+    });
+    if (booking) {
+      return {
+        customerName: booking.customerName,
+        customerNid: booking.customerNid,
+        customerPhone: booking.customerPhone,
+        customerWhatsapp: booking.customerWhatsapp,
+        customerEmail: booking.customerEmail,
+        customerAddress: booking.customerAddress,
+        organizationName: booking.organizationName,
+      };
+    }
+    return null;
+  }
+
   async findByDate(date: Date) {
     return this.bookingRepository.find({
       where: { eventDate: date },
@@ -60,9 +79,10 @@ export class ConventionBookingsService {
     const foodCost = this.normalizeNumeric(payload.foodCost);
     const addonsCost = this.normalizeNumeric(payload.addonsCost);
     const discount = this.normalizeNumeric(payload.discount);
+    const vatAmount = this.normalizeNumeric(payload.vatAmount);
     const advancePayment = this.normalizeNumeric(payload.advancePayment);
 
-    const totalAmount = Math.max(0, hallRent + foodCost + addonsCost - discount);
+    const totalAmount = Math.max(0, hallRent + foodCost + addonsCost - discount + vatAmount);
     const remainingPayment = Math.max(0, totalAmount - advancePayment);
     const paymentStatus: PaymentStatus = remainingPayment <= 0
       ? PaymentStatus.PAID
@@ -75,6 +95,7 @@ export class ConventionBookingsService {
       foodCost,
       addonsCost,
       discount,
+      vatAmount,
       advancePayment,
       totalAmount,
       remainingPayment,

@@ -33,7 +33,7 @@ export class ConventionBookingsController {
   }
   @Post('update-statuses')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  @Roles(UserRole.OWNER, UserRole.STAFF)
   async updateStatuses() {
     return this.scheduler.runManualUpdate();
   }
@@ -42,6 +42,13 @@ export class ConventionBookingsController {
   @Roles(UserRole.OWNER, UserRole.STAFF)
   findByDate(@Query('date') date: string) {
     return this.bookingsService.findByDate(new Date(date));
+  }
+
+  @Get('customer/:phone')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.OWNER, UserRole.STAFF)
+  findByPhone(@Param('phone') phone: string) {
+    return this.bookingsService.findByPhone(phone);
   }
 
   @Get('availability')

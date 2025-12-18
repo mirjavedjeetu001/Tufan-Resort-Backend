@@ -25,6 +25,23 @@ export class BookingsService {
     });
   }
 
+  async findByPhone(phone: string) {
+    const booking = await this.bookingRepository.findOne({
+      where: { customerPhone: phone },
+      order: { createdAt: 'DESC' },
+    });
+    if (booking) {
+      return {
+        guestName: booking.customerName,
+        guestEmail: booking.customerEmail,
+        guestPhone: booking.customerPhone,
+        guestNid: booking.customerNid,
+        guestAddress: booking.customerAddress,
+      };
+    }
+    return null;
+  }
+
   async findByDateRange(startDate: Date, endDate: Date) {
     await this.autoCheckoutOverdue();
     return this.bookingRepository
