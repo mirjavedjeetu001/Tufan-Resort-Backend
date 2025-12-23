@@ -32,10 +32,15 @@ export class ConventionBookingsService {
   }
 
   async findByPhone(phone: string) {
-    const booking = await this.bookingRepository.findOne({
-      where: { customerPhone: phone },
-      order: { createdAt: 'DESC' },
-    });
+    // Search by phone, NID, or other identifiers
+    const booking = await this.bookingRepository
+      .createQueryBuilder('booking')
+      .where('booking.customerPhone = :phone', { phone })
+      .orWhere('booking.customerNid = :phone', { phone })
+      .orWhere('booking.customerWhatsapp = :phone', { phone })
+      .orderBy('booking.createdAt', 'DESC')
+      .getOne();
+      
     if (booking) {
       return {
         customerName: booking.customerName,
@@ -112,6 +117,14 @@ export class ConventionBookingsService {
       }
     }
 
+    if (typeof bookingData.addonQuantities === 'string') {
+      try {
+        bookingData.addonQuantities = bookingData.addonQuantities.trim() ? JSON.parse(bookingData.addonQuantities) : {};
+      } catch (error) {
+        bookingData.addonQuantities = {};
+      }
+    }
+
     const totals = this.calculateTotals(bookingData);
     const booking = this.bookingRepository.create({
       ...bookingData,
@@ -131,6 +144,14 @@ export class ConventionBookingsService {
         bookingData.selectedAddons = bookingData.selectedAddons.trim() ? JSON.parse(bookingData.selectedAddons) : [];
       } catch (error) {
         bookingData.selectedAddons = existing.selectedAddons;
+      }
+    }
+
+    if (typeof bookingData.addonQuantities === 'string') {
+      try {
+        bookingData.addonQuantities = bookingData.addonQuantities.trim() ? JSON.parse(bookingData.addonQuantities) : {};
+      } catch (error) {
+        bookingData.addonQuantities = existing.addonQuantities || {};
       }
     }
 

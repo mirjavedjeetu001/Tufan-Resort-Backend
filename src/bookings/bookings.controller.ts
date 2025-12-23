@@ -82,6 +82,20 @@ export class BookingsController {
             cb(null, `${randomName}${extname(file.originalname)}`);
           },
         }),
+        limits: {
+          fileSize: 10 * 1024 * 1024, // 10MB limit per file
+        },
+        fileFilter: (req, file, cb) => {
+          // Allow images and PDFs
+          const allowedTypes = /jpeg|jpg|png|gif|pdf|webp/;
+          const mimetype = allowedTypes.test(file.mimetype);
+          const extname = allowedTypes.test(file.originalname.toLowerCase());
+          
+          if (mimetype && extname) {
+            return cb(null, true);
+          }
+          cb(new Error('Only image and PDF files are allowed!'), false);
+        },
       },
     ),
   )

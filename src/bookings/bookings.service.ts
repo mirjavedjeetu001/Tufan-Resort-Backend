@@ -26,10 +26,15 @@ export class BookingsService {
   }
 
   async findByPhone(phone: string) {
-    const booking = await this.bookingRepository.findOne({
-      where: { customerPhone: phone },
-      order: { createdAt: 'DESC' },
-    });
+    // Search by phone, NID, or passport number
+    const booking = await this.bookingRepository
+      .createQueryBuilder('booking')
+      .where('booking.customerPhone = :phone', { phone })
+      .orWhere('booking.customerNid = :phone', { phone })
+      .orWhere('booking.passportNumber = :phone', { phone })
+      .orderBy('booking.createdAt', 'DESC')
+      .getOne();
+      
     if (booking) {
       return {
         guestName: booking.customerName,
@@ -37,6 +42,7 @@ export class BookingsService {
         guestPhone: booking.customerPhone,
         guestNid: booking.customerNid,
         guestAddress: booking.customerAddress,
+        passportNumber: booking.passportNumber,
       };
     }
     return null;
