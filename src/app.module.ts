@@ -32,9 +32,11 @@ import { SystemSetting } from './entities/system-setting.entity';
 import { NavbarLink } from './entities/navbar-link.entity';
 import { FooterSection } from './entities/footer-section.entity';
 import { FooterLink } from './entities/footer-link.entity';
+import { ActivityLog } from './entities/activity-log.entity';
 import { SystemSettingsModule } from './system-settings/system-settings.module';
 import { NavbarModule } from './navbar/navbar.module';
 import { FooterModule } from './footer/footer.module';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -51,7 +53,7 @@ import { FooterModule } from './footer/footer.module';
         username: configService.get('DATABASE_USER'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User, Room, Booking, ConventionHall, ConventionBooking, ConventionPayment, HeroSlide, ResortInfo, FoodPackage, AddonService, MenuItem, RoomTypeEntity, SystemSetting, NavbarLink, FooterSection, FooterLink],
+        entities: [User, Room, Booking, ConventionHall, ConventionBooking, ConventionPayment, HeroSlide, ResortInfo, FoodPackage, AddonService, MenuItem, RoomTypeEntity, SystemSetting, NavbarLink, FooterSection, FooterLink, ActivityLog],
         synchronize: true, // Set to false in production
       }),
       inject: [ConfigService],
@@ -75,6 +77,7 @@ import { FooterModule } from './footer/footer.module';
     SystemSettingsModule,
     NavbarModule,
     FooterModule,
+    ActivityLogsModule,
   ],
 })
 export class AppModule {}

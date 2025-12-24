@@ -5,18 +5,35 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './roles.decorator';
 import { UserRole } from '../entities/user.entity';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService, private jwtService: JwtService) {}
+  constructor(
+    private authService: AuthService,
+    private jwtService: JwtService,
+    private activityLogsService: ActivityLogsService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: { email: string; password: string }) {
+  async login(@Body() loginDto: { email: string; password: string }, @Req() req: any) {
     const user = await this.authService.validateUser(loginDto.email, loginDto.password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
+    
+    // Log the login activity
+    await this.activityLogsService.createLog({
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      action: 'login',
+      entityType: 'auth',
+      description: `User ${user.name} logged in successfully`,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+    });
+    
     return this.authService.login(user);
   }
 

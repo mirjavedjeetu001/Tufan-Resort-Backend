@@ -204,6 +204,47 @@ export class ConventionBookingsService {
     }).then((bookings) => bookings.filter((b) => b.status !== 'cancelled' && this.timeSlotOverlaps(b.timeSlot, timeSlot)));
   }
 
+  async getAvailableHalls(date: Date, timeSlot: string) {
+    try {
+      // Normalize date to start of day for consistent comparison
+      const searchDate = new Date(date);
+      searchDate.setHours(0, 0, 0, 0);
+
+      // Get all halls
+      const allHalls = await this.hallRepository.find();
+
+      // Get all bookings for the given date
+      const allBookings = await this.bookingRepository.find({
+        relations: ['hall'],
+      });
+
+      // Filter bookings for the same date
+      const sameDayBookings = allBookings.filter(booking => {
+        const bookingDate = new Date(booking.eventDate);
+        bookingDate.setHours(0, 0, 0, 0);
+        return bookingDate.getTime() === searchDate.getTime();
+      });
+
+      // Get hall IDs that are booked for the requested time slot
+      const bookedHallIds = sameDayBookings
+        .filter(b => b.status !== 'cancelled' && this.timeSlotOverlaps(b.timeSlot, timeSlot))
+        .map(b => b.hallId);
+
+      // Return halls that are not booked
+      const availableHalls = allHalls.filter(hall => !bookedHallIds.includes(hall.id));
+
+      return {
+        availableHalls,
+        bookedHallIds,
+        totalHalls: allHalls.length,
+        availableCount: availableHalls.length,
+      };
+    } catch (error) {
+      console.error('Error getting available halls:', error);
+      throw error;
+    }
+  }
+
   async checkHallAvailability(hallId: number, date: Date, timeSlot: string) {
     try {
       const hall = await this.hallRepository.findOne({ where: { id: hallId } });

@@ -64,7 +64,13 @@ export class ConventionBooking {
   @Column({ type: 'date' })
   eventDate: Date;
 
-  @Column()
+  @Column({ type: 'time', nullable: true })
+  startTime: string;
+
+  @Column({ type: 'time', nullable: true })
+  endTime: string;
+
+  @Column({ nullable: true })
   timeSlot: string;
 
   @Column()

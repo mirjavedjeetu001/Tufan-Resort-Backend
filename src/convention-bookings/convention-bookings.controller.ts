@@ -51,6 +51,12 @@ export class ConventionBookingsController {
     return this.bookingsService.findByPhone(phone);
   }
 
+  // Public endpoint for checking availability (no auth required)
+  @Get('public/available-halls')
+  async getAvailableHalls(@Query('date') date: string, @Query('timeSlot') timeSlot: string) {
+    return this.bookingsService.getAvailableHalls(new Date(date), timeSlot);
+  }
+
   @Get('availability')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.OWNER, UserRole.STAFF)

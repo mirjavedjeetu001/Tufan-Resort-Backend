@@ -10,6 +10,7 @@ import {
   UseGuards,
   UploadedFiles,
   UseInterceptors,
+  Request,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -19,10 +20,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../entities/user.entity';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Controller('rooms')
 export class RoomsController {
-  constructor(private roomsService: RoomsService) {}
+  constructor(
+    private roomsService: RoomsService,
+    private activityLogsService: ActivityLogsService,
+  ) {}
 
   @Get()
   findAll() {
@@ -82,14 +87,29 @@ export class RoomsController {
       }),
     }),
   )
-  async create(@Body() roomData: any, @UploadedFiles() files: Express.Multer.File[]) {
+  async create(@Body() roomData: any, @UploadedFiles() files: Express.Multer.File[], @Request() req) {
     if (files && files.length > 0) {
       roomData.images = files.map((file) => `/uploads/rooms/${file.filename}`);
     }
     if (typeof roomData.amenities === 'string') {
       roomData.amenities = roomData.amenities.split(',').map((a) => a.trim());
     }
-    return this.roomsService.create(roomData);
+    const room = await this.roomsService.create(roomData);
+    
+    // Log activity
+    await this.activityLogsService.createLog({
+      userId: req.user?.userId,
+      userName: req.user?.name || req.user?.username || 'Admin',
+      userEmail: req.user?.email || 'admin@system.com',
+      action: 'create',
+      entityType: 'room',
+      entityId: room.id,
+      description: `Created room ${room.roomNumber} - ${room.name}`,
+      changes: roomData,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+    });
+    
+    return room;
   }
 
   @Put(':id')
@@ -113,6 +133,7 @@ export class RoomsController {
     @Param('id') id: string,
     @Body() roomData: any,
     @UploadedFiles() files: Express.Multer.File[],
+    @Request() req,
   ) {
     if (files && files.length > 0) {
       const newImages = files.map((file) => `/uploads/rooms/${file.filename}`);
@@ -123,13 +144,43 @@ export class RoomsController {
     if (typeof roomData.amenities === 'string') {
       roomData.amenities = roomData.amenities.split(',').map((a) => a.trim());
     }
-    return this.roomsService.update(+id, roomData);
+    const room = await this.roomsService.update(+id, roomData);
+    
+    // Log activity
+    await this.activityLogsService.createLog({
+      userId: req.user?.userId,
+      userName: req.user?.name || req.user?.username || 'Admin',
+      userEmail: req.user?.email || 'admin@system.com',
+      action: 'update',
+      entityType: 'room',
+      entityId: +id,
+      description: `Updated room ${roomData.roomNumber || room.roomNumber} - ${roomData.name || room.name}`,
+      changes: roomData,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+    });
+    
+    return room;
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.OWNER)
-  delete(@Param('id') id: string) {
-    return this.roomsService.delete(+id);
+  async delete(@Param('id') id: string, @Request() req) {
+    const room = await this.roomsService.findOne(+id);
+    const result = await this.roomsService.delete(+id);
+    
+    // Log activity
+    await this.activityLogsService.createLog({
+      userId: req.user?.userId,
+      userName: req.user?.name || req.user?.username || 'Admin',
+      userEmail: req.user?.email || 'admin@system.com',
+      action: 'delete',
+      entityType: 'room',
+      entityId: +id,
+      description: `Deleted room ${room?.roomNumber} - ${room?.name}`,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+    });
+    
+    return result;
   }
 }

@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { User } from '../entities/user.entity';
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { User } from '../entities/user.entity';
       secret: process.env.JWT_SECRET || 'your_jwt_secret_key_change_in_production',
       signOptions: { expiresIn: '7d' as any },
     }),
+    ActivityLogsModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

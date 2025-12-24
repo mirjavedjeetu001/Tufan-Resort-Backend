@@ -20,10 +20,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '../entities/user.entity';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Controller('bookings')
 export class BookingsController {
-  constructor(private bookingsService: BookingsService) {}
+  constructor(
+    private bookingsService: BookingsService,
+    private activityLogsService: ActivityLogsService,
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -99,7 +103,7 @@ export class BookingsController {
       },
     ),
   )
-  create(
+  async create(
     @Body() bookingData: any,
     @UploadedFiles() files: { 
       customerPhoto?: Express.Multer.File[]; 
@@ -138,20 +142,65 @@ export class BookingsController {
     bookingData.discountAmount = parseFloat(bookingData.discountAmount || 0);
     
     bookingData.createdById = req.user.userId;
-    return this.bookingsService.create(bookingData);
+    const booking = await this.bookingsService.create(bookingData);
+    
+    // Log activity
+    await this.activityLogsService.createLog({
+      userId: req.user.userId,
+      userName: req.user.name || req.user.username || 'Admin',
+      userEmail: req.user.email,
+      action: 'create',
+      entityType: 'booking',
+      entityId: booking.id,
+      description: `Created booking for ${bookingData.customerName} - Room ${booking.room?.roomNumber || bookingData.roomId}`,
+      changes: bookingData,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+    });
+    
+    return booking;
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.OWNER, UserRole.STAFF)
-  update(@Param('id') id: string, @Body() bookingData: any) {
-    return this.bookingsService.update(+id, bookingData);
+  async update(@Param('id') id: string, @Body() bookingData: any, @Request() req) {
+    const booking = await this.bookingsService.update(+id, bookingData);
+    
+    // Log activity
+    await this.activityLogsService.createLog({
+      userId: req.user.userId,
+      userName: req.user.name || req.user.username || 'Admin',
+      userEmail: req.user.email,
+      action: 'update',
+      entityType: 'booking',
+      entityId: +id,
+      description: `Updated booking #${id} - ${bookingData.customerName || 'Guest'}`,
+      changes: bookingData,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+    });
+    
+    return booking;
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.OWNER)
-  delete(@Param('id') id: string) {
-    return this.bookingsService.delete(+id);
+  async delete(@Param('id') id: string, @Request() req) {
+    const booking = await this.bookingsService.findOne(+id);
+    const result = await this.bookingsService.delete(+id);
+    
+    // Log activity
+    await this.activityLogsService.createLog({
+      userId: req.user.userId,
+      userName: req.user.name || req.user.username || 'Admin',
+      userEmail: req.user.email,
+      action: 'delete',
+      entityType: 'booking',
+      entityId: +id,
+      description: `Deleted booking #${id} - ${booking?.customerName || 'Guest'}`,
+      ipAddress: req.ip || req.connection?.remoteAddress,
+    });
+    
+    return result;
   }
 }

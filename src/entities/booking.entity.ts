@@ -77,8 +77,14 @@ export class Booking {
   @Column({ type: 'date' })
   checkInDate: Date;
 
+  @Column({ type: 'time', nullable: true })
+  checkInTime: string;
+
   @Column({ type: 'date' })
   checkOutDate: Date;
+
+  @Column({ type: 'time', nullable: true })
+  checkOutTime: string;
 
   @Column()
   numberOfGuests: number;
@@ -150,12 +156,6 @@ export class Booking {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
-
-  @Column({ type: 'time', nullable: true })
-  checkInTime: string;
-
-  @Column({ type: 'time', nullable: true })
-  checkOutTime: string;
 
   @Column({ default: 'ac' })
   acPreference: string;
